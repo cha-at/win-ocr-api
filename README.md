@@ -240,5 +240,5 @@ Issues and pull requests are welcome, in English or Chinese. Please read [CONTRI
 
 ## License
 
-Copyright (C) 2026 cha-at. Licensed under the [GNU General Public License v3.0](LICENSE) — if you distribute a
-modified version, it must stay under the GPL.
+Copyright (C) 2026 ChakerAt.
+Licensed under [GNU General Public License v3.0](LICENSE)

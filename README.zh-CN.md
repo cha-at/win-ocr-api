@@ -221,4 +221,5 @@ Issue 和 PR 都欢迎，中英文都行。动手前请先看 [CONTRIBUTING.md](
 
 ## 许可证
 
-Copyright (C) 2026 cha-at。本项目以 [GNU General Public License v3.0](LICENSE) 授权——发布修改版时必须继续开源。
+Copyright (C) 2026 ChakerAt。
+本项目以 [GNU General Public License v3.0](LICENSE) 授权
