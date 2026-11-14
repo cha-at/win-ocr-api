@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- sparse package（包清单 + 资源在这里，exe 留在 dist 目录）：
+     用 Add-AppxPackage -Register -ExternalLocation 注册，进程才有包身份。
+     Windows AI API 还要求 systemAIModels 能力声明。 -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
+  IgnorableNamespaces="uap uap10 rescap systemai">
+
+  <Identity
+    Name="WinOcrApi"
+    Publisher="CN=WinOcrApi"
+    Version="1.0.0.0" />
+
+  <Properties>
+    <DisplayName>Windows OCR API</DisplayName>
+    <PublisherDisplayName>WinOcrApi</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+    <uap10:AllowExternalContent>true</uap10:AllowExternalContent>
+  </Properties>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19000.0" MaxVersionTested="10.0.26226.0" />
+    <PackageDependency
+      Name="Microsoft.WindowsAppRuntime.2"
+      Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+      MinVersion="2.6.5.0" />
+  </Dependencies>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="unvirtualizedResources" />
+    <!-- Windows AI API 的准入证 -->
+    <systemai:Capability Name="systemAIModels" />
+  </Capabilities>
+
+  <Applications>
+    <Application
+      Id="WinOcrApi"
+      Executable="WinOcrApi.exe"
+      uap10:TrustLevel="mediumIL"
+      uap10:RuntimeBehavior="win32App">
+      <uap:VisualElements
+        DisplayName="Windows OCR API"
+        Description="Windows OCR / AI TextRecognizer over HTTP"
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png" />
+    </Application>
+  </Applications>
+</Package>
+

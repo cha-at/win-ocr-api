@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>WinOcrApi</RootNamespace>
+    <AssemblyName>WinOcrApi</AssemblyName>
+
+    <!-- 项目元数据（GitHub / NuGet 均从这里取） -->
+    <Version>0.1.0</Version>
+    <Product>Windows OCR API</Product>
+    <Description>Local HTTP API that exposes the built-in Windows OCR engines (Windows.Media.Ocr and the Windows AI TextRecognizer) as JSON or plain-text endpoints.</Description>
+    <Authors>cha-at</Authors>
+    <Copyright>Copyright (C) 2026 cha-at</Copyright>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/cha-at/win-ocr-api</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK.AI" Version="2.6.5" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.6.5" />
+  </ItemGroup>
+
+</Project>

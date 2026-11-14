@@ -1,0 +1,96 @@
+name: Bug report
+description: Something does not work — a wrong result, an error, a crash.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please fill in the environment block — almost every OCR bug is specific to a Windows
+        build, an OCR language pack, or package identity.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: The request you sent (redact tokens) and the response you got.
+      render: console
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: For recognition quality issues, attach or describe the image so the result can be reproduced.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. .\publish.ps1
+        2. .\dist\WinOcrApi.exe
+        3. curl.exe -s --data-binary "@a.png" "http://127.0.0.1:8737/ocr?lang=zh-Hans"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and build
+      description: From `winver`, or `[System.Environment]::OSVersion.Version` in PowerShell.
+      placeholder: Windows 11 24H2 (22631.4460)
+    validations:
+      required: true
+  - type: input
+    id: cpu
+    attributes:
+      label: CPU architecture
+      placeholder: arm64 / x64
+    validations:
+      required: true
+  - type: input
+    id: dotnet
+    attributes:
+      label: .NET version
+      description: Output of `dotnet --version`, or the runtime version if you use a published build.
+    validations:
+      required: true
+  - type: textarea
+    id: health
+    attributes:
+      label: Output of GET /health and GET /engines
+      description: Redact anything you consider private.
+      render: json
+    validations:
+      required: false
+  - type: dropdown
+    id: packaged
+    attributes:
+      label: Did you register the sparse package?
+      description: `.\package\register.ps1` gives the process package identity, which the AI engine requires.
+      options:
+        - "No — running dist\\WinOcrApi.exe directly"
+        - "Yes — registered and launched via package/launch.ps1"
+        - "Yes — installed the MSIX"
+        - "Not sure"
+    validations:
+      required: true
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Which engine was used?
+      options:
+        - "auto"
+        - "windows (classic)"
+        - "ai (NPU)"
+        - "All of them"
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed API tokens and private data from the logs above.
+          required: true

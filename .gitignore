@@ -1,0 +1,50 @@
+# ── 构建产物 ───────────────────────────────────────────────
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+arm64/
+
+# 本项目的发布 / 打包目录
+dist/
+out/
+packed/
+msix_stage/
+
+# ── 签名与安装包（绝不入库）─────────────────────────────────
+*.pfx
+*.cer
+*.msix
+*.msixbundle
+*.msixupload
+*.appx
+*.appxbundle
+*.appxupload
+
+# ── IDE / 编辑器 ──────────────────────────────────────────
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.DotSettings.user
+*.sln.docstates
+
+# ── 测试与覆盖率 ──────────────────────────────────────────
+TestResults/
+coverage*
+*.coverage
+*.trx
+
+# ── 日志与临时文件 ────────────────────────────────────────
+*.log
+*.tmp
+*.bak
+~$*
+
+# ── 操作系统 ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

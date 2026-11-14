@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest an endpoint, an option, an engine or a workflow.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: this project deliberately stays a thin local wrapper around the OCR engines Windows already
+        has. Big features (queues, multi-user auth, a database) are usually out of scope.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that the current API makes awkward?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Concrete API shape if you can — parameter names, request/response example.
+      render: json
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other endpoints, tools or workarounds you tried.
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: I read README.md and the API already does not cover this.
+          required: true

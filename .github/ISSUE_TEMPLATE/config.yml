@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/cha-at/win-ocr-api/security/advisories/new
+    about: Do not open a public issue for security problems — use a private advisory.
+  - name: AI engine setup
+    url: https://github.com/cha-at/win-ocr-api/blob/main/docs/ai-engine.md
+    about: The NPU engine needs a signed package install; read this before filing a bug about engine=ai.

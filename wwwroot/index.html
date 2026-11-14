@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows OCR API</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f9; --panel: #fff; --text: #16181d; --muted: #6b7280;
+    --border: #e3e6ec; --accent: #2563eb; --accent-soft: #eff4ff; --ok: #15803d; --err: #b91c1c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1115; --panel:#171a21; --text:#e6e8ee; --muted:#9aa3b2;
+            --border:#272c36; --accent:#5b8cff; --accent-soft:#1b2233; --ok:#4ade80; --err:#f87171; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:28px 20px 60px; background:var(--bg); color:var(--text);
+         font: 14px/1.55 "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif; }
+  main { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 19px; margin: 0 0 4px; letter-spacing: .2px; }
+  .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
+  .sub code { background: var(--panel); border:1px solid var(--border); border-radius:5px; padding:1px 5px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .drop { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+          border: 1.5px dashed var(--border); border-radius: 10px; padding: 22px 12px;
+          color: var(--muted); cursor: pointer; text-align:center; transition: .15s; min-height: 132px; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+  .drop b { color: var(--text); font-weight: 600; }
+  #preview { max-width: 100%; max-height: 240px; border-radius: 8px; display: none; margin-top: 10px; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; margin-top: 12px; }
+  .form { display:grid; grid-template-columns: auto minmax(0,1fr); gap:8px 10px; align-items:center; margin-top: 14px; }
+  .form select { width: 100%; min-width: 0; }
+  label.f { color: var(--muted); font-size: 12.5px; }
+  select, button { font: inherit; color: var(--text); background: var(--panel);
+                   border: 1px solid var(--border); border-radius: 7px; padding: 5px 9px; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; padding: 6px 16px; }
+  button:disabled { opacity: .5; cursor: default; }
+  .meta { color: var(--muted); font-size: 12px; margin: 10px 0 6px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .meta span.ok { color: var(--ok); }
+  .meta span.err { color: var(--err); }
+  textarea { width: 100%; min-height: 210px; resize: vertical; background: var(--bg); color: var(--text);
+             border: 1px solid var(--border); border-radius: 10px; padding: 10px; font: 13px/1.6 Consolas, "Microsoft YaHei UI", monospace; }
+  details { margin-top: 14px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+  pre { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px;
+        overflow: auto; max-height: 320px; font-size: 12px; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Windows 内置 OCR → HTTP API</h1>
+  <div class="sub">
+    引擎 <code>Windows.Media.Ocr</code> · <code>Windows AI TextRecognizer</code>；接口 <code>POST /ocr</code>、<code>GET /engines</code>、<code>GET /diag/ai</code>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <div class="drop" id="drop">
+        <b>拖入 / 点击选择 / Ctrl+V 粘贴图片</b>
+        <span>png · jpg · bmp · tiff · gif · heic</span>
+      </div>
+      <img id="preview" alt="预览">
+      <div class="form">
+        <label class="f" for="engine">引擎</label>
+        <select id="engine">
+          <option value="">自动（AI 就绪就用 AI）</option>
+          <option value="windows">传统 OCR（CPU）</option>
+          <option value="ai" title="需要已就绪的 NPU 模型">AI OCR（NPU）</option>
+        </select>
+        <label class="f" for="lang">语言</label>
+        <select id="lang"><option value="">自动（系统默认）</option></select>
+      </div>
+      <div class="row">
+        <label class="f"><input type="checkbox" id="words" checked> 词级坐标</label>
+        <button class="primary" id="go" disabled>识别</button>
+      </div>
+      <div class="hint">提示：小图更容易识别错误，可先用其他工具放大 2–3 倍。</div>
+    </section>
+
+    <section class="card">
+      <div class="meta" id="meta">等待图片…</div>
+      <textarea id="out" placeholder="识别结果会出现在这里" spellcheck="false"></textarea>
+      <div class="row">
+        <button id="copy">复制文本</button>
+        <button id="clear">清空</button>
+      </div>
+      <details>
+        <summary>查看原始 JSON</summary>
+        <pre id="json"></pre>
+      </details>
+    </section>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let currentFile = null;
+let controller = null;
+
+fetch('/languages').then(r => r.json()).then(data => {
+  for (const l of data.languages || []) {
+    const opt = document.createElement('option');
+    opt.value = l.tag;
+    opt.textContent = `${l.displayName}（${l.tag}）`;
+    if (l.tag === data.default) opt.textContent += ' · 默认';
+    $('lang').appendChild(opt);
+  }
+}).catch(() => {});
+
+fetch('/engines').then(r => r.json()).then(data => {
+  const ai = (data.engines || []).find(e => e.id === 'ai');
+  const opt = [...$('engine').options].find(o => o.value === 'ai');
+  if (!opt) return;
+  if (ai && ai.available) {
+    opt.textContent = 'AI OCR（NPU · 就绪）';
+  } else {
+    opt.disabled = true;
+    opt.textContent = 'AI OCR（NPU · 不可用）';
+    opt.title = ai ? ai.status : '';
+  }
+}).catch(() => {});
+
+function setMeta(html, cls) {
+  $('meta').innerHTML = cls ? `<span class="${cls}">${html}</span>` : html;
+}
+
+function accept(file) {
+  if (!file) return;
+  currentFile = file;
+  $('go').disabled = false;
+  const url = URL.createObjectURL(file);
+  $('preview').src = url;
+  $('preview').style.display = 'block';
+  $('preview').onload = () => URL.revokeObjectURL(url);
+  setMeta(`${file.name || '剪贴板图片'} · ${(file.size / 1024).toFixed(1)} KB · 未识别`);
+  $('out').value = '';
+  $('json').textContent = '';
+}
+
+$('drop').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = () => accept(input.files[0]);
+  input.click();
+});
+$('drop').addEventListener('dragover', (e) => { e.preventDefault(); $('drop').classList.add('over'); });
+$('drop').addEventListener('dragleave', () => $('drop').classList.remove('over'));
+$('drop').addEventListener('drop', (e) => {
+  e.preventDefault();
+  $('drop').classList.remove('over');
+  accept(e.dataTransfer.files[0]);
+});
+document.addEventListener('paste', (e) => {
+  const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (item) accept(item.getAsFile());
+});
+
+$('go').addEventListener('click', async () => {
+  if (!currentFile) return;
+  controller?.abort();
+  controller = new AbortController();
+  $('go').disabled = true;
+  setMeta('识别中…');
+  const params = new URLSearchParams();
+  const lang = $('lang').value;
+  if (lang) params.set('lang', lang);
+  const engine = $('engine').value;
+  if (engine) params.set('engine', engine);
+  if (!$('words').checked) params.set('words', 'false');
+  const t0 = performance.now();
+  try {
+    const res = await fetch('/ocr?' + params, {
+      method: 'POST',
+      headers: { 'Content-Type': currentFile.type || 'application/octet-stream' },
+      body: currentFile,
+      signal: controller.signal,
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    $('out').value = data.text;
+    $('json').textContent = JSON.stringify(data, null, 2);
+    setMeta(`${res.status} OK · ${data.engine || 'windows'} · ${data.languageName} · ${data.width}×${data.height} · ` +
+            `${data.lineCount} 行 / ${data.wordCount} 词 · ${Math.round(performance.now() - t0)} ms`, 'ok');
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    setMeta(`失败：${err.message}`, 'err');
+  } finally {
+    $('go').disabled = false;
+  }
+});
+
+$('copy').addEventListener('click', async () => {
+  await navigator.clipboard.writeText($('out').value);
+  $('copy').textContent = '已复制';
+  setTimeout(() => ($('copy').textContent = '复制文本'), 1200);
+});
+$('clear').addEventListener('click', () => {
+  $('out').value = '';
+  $('json').textContent = '';
+  setMeta('等待图片…');
+});
+</script>
+</body>
+</html>

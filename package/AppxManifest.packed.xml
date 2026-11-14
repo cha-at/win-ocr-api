@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 完整包（exe 在包内）布局的参考清单：Windows AI 的 systemAIModels 能力可能只认这种布局。
+     正常流程由 package\build-msix.ps1 从 AppxManifest.xml 自动派生这份清单，此文件仅作对照与记录，
+     不要直接注册；排查过程见 docs\ai-engine.md。 -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
+  IgnorableNamespaces="uap uap10 rescap systemai">
+
+  <Identity
+    Name="WinOcrApi"
+    Publisher="CN=WinOcrApi"
+    Version="1.0.0.0"
+    ProcessorArchitecture="arm64" />
+
+  <Properties>
+    <DisplayName>Windows OCR API</DisplayName>
+    <PublisherDisplayName>WinOcrApi</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+    <uap10:PackageIntegrity>
+      <uap10:Content Enforcement="on" />
+    </uap10:PackageIntegrity>
+  </Properties>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19000.0" MaxVersionTested="10.0.26226.0" />
+    <PackageDependency
+      Name="Microsoft.WindowsAppRuntime.1.8"
+      Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+      MinVersion="8000.994.2142.0" />
+  </Dependencies>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <!-- Windows AI API 的准入证 -->
+    <systemai:Capability Name="systemAIModels" />
+  </Capabilities>
+
+  <Applications>
+    <Application
+      Id="WinOcrApi"
+      Executable="WinOcrApi.exe"
+      EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Windows OCR API"
+        Description="Windows OCR / AI TextRecognizer over HTTP"
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png" />
+    </Application>
+  </Applications>
+</Package>
+
